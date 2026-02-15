@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Login | Ultra Premium</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            perspective: 1000px;
+        }
+
+        /* Background Animation */
+        .bg-animation {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Login Form Container - 3D Tilt */
+        .login-box {
+            position: relative;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            width: 380px;
+            z-index: 10;
+            transform-style: preserve-3d;
+            transition: transform 0.3s;
+        }
+
+        .login-box:hover {
+            transform: rotateY(5deg) rotateX(5deg);
+        }
+
+        h2 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .input-box {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .input-box input {
+            width: 100%;
+            padding: 12px 0;
+            font-size: 16px;
+            color: white;
+            margin-bottom: 5px;
+            border: none;
+            border-bottom: 2px solid rgba(255,255,255,0.5);
+            outline: none;
+            background: transparent;
+            transition: 0.3s;
+        }
+
+        .input-box label {
+            position: absolute;
+            top: 12px;
+            left: 0;
+            font-size: 16px;
+            color: rgba(255,255,255,0.7);
+            pointer-events: none;
+            transition: 0.3s;
+        }
+
+        .input-box input:focus ~ label,
+        .input-box input:valid ~ label {
+            top: -12px;
+            color: #fff;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .input-box input:focus {
+            border-bottom: 2px solid #fff;
+        }
+
+        button {
+            width: 100%;
+            background: white;
+            color: #764ba2;
+            border: none;
+            padding: 15px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        button:active {
+            transform: translateY(-1px);
+        }
+
+        /* Success Screen */
+        .success-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 50px;
+        }
+
+        .success-text {
+            color: white;
+            font-size: 40px;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            animation: fadeInDown 1s;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 3D Flip Cards Container */
+        .cards-container {
+            display: flex;
+            gap: 80px;
+            perspective: 1000px;
+        }
+
+        /* The Flip Card */
+        .flip-card {
+            background-color: transparent;
+            width: 280px;
+            height: 380px;
+            perspective: 1000px;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+        }
+
+        /* 360 Rotation Class */
+        .rotate-360 {
+            animation: fullRotate 2s ease-in-out forwards;
+        }
+
+        @keyframes fullRotate {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(360deg); }
+        }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            padding: 20px;
+        }
+
+        /* Card 1 Colors */
+        .card1 .flip-card-front {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .card1 .flip-card-back {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            transform: rotateY(180deg);
+        }
+
+        /* Card 2 Colors */
+        .card2 .flip-card-front {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .card2 .flip-card-back {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+            transform: rotateY(180deg);
+        }
+
+        .card-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+
+        .flip-card h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .flip-card p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        /* Loading Spinner */
+        .loader {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ffffff;
+            border-top: 2px solid #764ba2;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .cards-container {
+                flex-direction: column;
+                gap: 30px;
+            }
+            .flip-card {
+                width: 240px;
+                height: 320px;
+            }
+            .success-text {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background -->
+    <div class="bg-animation"></div>
+
+    <!-- Login Form -->
+    <div class="login-box" id="loginBox">
+        <h2>Login</h2>
+        <form id="loginForm">
+            <div class="input-box">
+                <input type="text" id="username" required>
+                <label>Username</label>
+            </div>
+            <div class="input-box">
+                <input type="password" id="password" required>
+                <label>Password</label>
+            </div>
+            <button type="submit" id="btn">
+                <span id="btnText">Sign In</span>
+                <div class="loader" id="loader"></div>
+            </button>
+        </form>
+    </div>
+
+    <!-- Success Screen with 3D Cards -->
+    <div class="success-screen" id="successScreen">
+        <div class="success-text">Welcome! 🎉</div>
+        
+        <div class="cards-container">
+            <!-- Card 1 -->
+            <div class="flip-card card1" id="card1">
+                <div class="flip-card-inner" id="inner1">
+                    <div class="flip-card-front">
+                        <div class="card-icon">🚀</div>
+                        <h3>Start</h3>
+                        <p>Click to Flip 360°</p>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="card-icon">✨</div>
+                        <h3>Success</h3>
+                        <p>You Made It!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="flip-card card2" id="card2">
+                <div class="flip-card-inner" id="inner2">
+                    <div class="flip-card-front">
+                        <div class="card-icon">🎨</div>
+                        <h3>Create</h3>
+                        <p>Click to Flip 360°</p>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="card-icon">🌟</div>
+                        <h3>Inspire</h3>
+                        <p>Keep Going!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Login Form Handler
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const btn = document.getElementById('btn');
+            const btnText = document.getElementById('btnText');
+            const loader = document.getElementById('loader');
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // Show loader
+            btnText.style.display = 'none';
+            loader.style.display = 'block';
+            btn.disabled = true;
+
+            // Simulate login delay
+            setTimeout(() => {
+                // Check credentials (any non-empty values work for demo)
+                if(username && password) {
+                    // Hide login, show success
+                    document.getElementById('loginBox').style.display = 'none';
+                    const successScreen = document.getElementById('successScreen');
+                    successScreen.style.display = 'flex';
+                    
+                    // Trigger 360 flip animation for both cards
+                    setTimeout(() => {
+                        document.getElementById('inner1').classList.add('rotate-360');
+                        
+                        setTimeout(() => {
+                            document.getElementById('inner2').classList.add('rotate-360');
+                        }, 300); // Slight delay between cards
+                        
+                    }, 500); // Wait for success screen to appear
+                    
+                } else {
+                    alert('Please fill both fields!');
+                    btnText.style.display = 'block';
+                    loader.style.display = 'none';
+                    btn.disabled = false;
+                }
+            }, 1500);
+        });
+
+        // Manual flip on card click
+        document.getElementById('card1').addEventListener('click', function() {
+            const inner = document.getElementById('inner1');
+            // Toggle 360 rotation
+            if(inner.style.transform === 'rotateY(360deg)') {
+                inner.style.transform = 'rotateY(0deg)';
+            } else {
+                inner.style.transform = 'rotateY(360deg)';
+            }
+        });
+
+        document.getElementById('card2').addEventListener('click', function() {
+            const inner = document.getElementById('inner2');
+            if(inner.style.transform === 'rotateY(360deg)') {
+                inner.style.transform = 'rotateY(0deg)';
+            } else {
+                inner.style.transform = 'rotateY(360deg)';
+            }
+        });
+
+        // 3D Tilt Effect on Mouse Move for Login Box
+        document.addEventListener('mousemove', (e) => {
+            if(document.getElementById('successScreen').style.display === 'flex') return;
+            
+            const box = document.getElementById('loginBox');
+            const x = (window.innerWidth / 2 - e.pageX) / 25;
+            const y = (window.innerHeight / 2 - e.pageY) / 25;
+            
+            box.style.transform = `rotateY(${x}deg) rotateX(${y}deg)`;
+        });
+    </script>
+
+</body>
+</html>
